@@ -1,0 +1,32 @@
+name: Setup Workflow
+description: Setup GitHub Action Workflow
+inputs:
+  artifactory-token:
+    required: true
+    description: Artifactory token
+
+runs:
+  using: composite
+  steps:
+    - name: Setup Node
+      uses: actions/setup-node@v4
+      with:
+        node-version-file: '.nvmrc'
+        cache: 'npm'
+        cache-dependency-path: 'package-lock.json'
+
+    - name: Configure NPM
+      run: |
+        npm config set registry https://registry.npmjs.org
+        npm config set @monsantoit:registry https://npm.platforms.engineering
+        npm config set //artifactory.bayer.com/artifactory/api/npm/npm-platforms-engineering/:_auth NaN
+      shell: bash
+
+    - name: Install Dependencies
+      run: npm ci
+      shell: bash
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+
+
